@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../widgets/Navbar";
 import HolographicAvatar from "../components/HolographicAvatar";
@@ -82,6 +82,31 @@ export default function Home() {
     setShowModal(false);
     setScanning(true);
   };
+  const audioRef = useRef(null);
+  useEffect(() => {
+    const audio = new Audio("/public/preview.mp3");
+    audioRef.current = audio;
+
+    const playAudio = () => {
+      audio.play().catch((error) => {
+        console.error("Autoplay was prevented:", error);
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        playAudio();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    playAudio();
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      audio.pause();
+    };
+  }, []);
 
   return (
     <div className="flex flex-col bg-[#0a0a2e] text-cyan-400 font-mono overflow-scroll">
