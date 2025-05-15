@@ -84,26 +84,28 @@ export default function Home() {
   };
   const audioRef = useRef(null);
   useEffect(() => {
-    const audio = new Audio("/public/preview.mp3");
+    const audio = new Audio("/preview.mp3");
     audioRef.current = audio;
 
-    const playAudio = () => {
+    const playAudioOnce = () => {
       audio.play().catch((error) => {
-        console.error("Autoplay was prevented:", error);
+        console.error("Autoplay prevented:", error);
       });
+      // Bir marta ishga tushirgandan keyin listenerni olib tashlaymiz
+      window.removeEventListener("click", playAudioOnce);
+      window.removeEventListener("mousemove", playAudioOnce);
+      window.removeEventListener("keydown", playAudioOnce);
     };
 
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        playAudio();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    playAudio();
+    // Foydalanuvchi interactionini kutamiz
+    window.addEventListener("click", playAudioOnce);
+    window.addEventListener("mousemove", playAudioOnce);
+    window.addEventListener("keydown", playAudioOnce);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("click", playAudioOnce);
+      window.removeEventListener("mousemove", playAudioOnce);
+      window.removeEventListener("keydown", playAudioOnce);
       audio.pause();
     };
   }, []);
